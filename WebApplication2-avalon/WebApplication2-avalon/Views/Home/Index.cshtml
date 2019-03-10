@@ -1,0 +1,117 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<script src="~/Scripts/avalon.js"></script>
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<script type="text/javascript">
+    var vm = avalon.define({
+        $id: "test",
+        tarr1: {
+            isselall: 0,
+            allarr: ['3期', '6期', '12期', '18期'],
+            selarr:[]
+        },
+        name: "黄忠情",
+        array: ['3期', '6期', '12期'],
+        selectarr: [],
+        array2: [{ 'id': 1, 'name': "3期" }, { 'id': 6, 'name': "6期" }, { 'id': 12, 'name': "12期" }],
+        selectarr2: [],
+        select_all_a1: 0,
+        checkAll: function (arr) {
+            if (arr.isselall == 1) {
+                arr.allarr.forEach(function (v) {//循环保存着已经勾选选框的数据
+                    arr.selarr.ensure(v);//如果里面没有当前选框的数据，就保存
+                });
+            } else
+                arr.selarr.clear();//清空
+        },
+        checkOne: function (arr) {
+            if (arr.selarr.length == arr.allarr.length)//子选框全部被勾选
+                arr.isselall = 1;
+            else//子选框
+                arr.isselall = 0;
+        }
+    })
+
+    vm.select_all_cb = function () {//全选框change事件回调
+        if (vm.select_all_a1==1) {
+            avalon.each(vm.array, function (i, v) {//循环保存着已经勾选选框的数据
+                vm.selectarr.ensure(v);//如果里面没有当前选框的数据，就保存
+            });
+        } else
+            vm.selectarr.clear();//清空
+    };
+    vm.select_all_cb2 = function (a,b,c) {//全选框change事件回调
+        if (a == 1) {
+            avalon.each(b, function (i, v) {//循环保存着已经勾选选框的数据
+                c.ensure(v);//如果里面没有当前选框的数据，就保存
+            });
+        } else
+            c.clear();//清空
+    };
+    vm.select_all_cb3 = function (a,b,c) {//全选框change事件回调
+        var len = a.length;
+        if (b.length == len)//子选框全部被勾选
+            c = 1;
+        else//子选框有一个没有被勾选
+            c = 0;
+    };
+
+    avalon.define({
+        $id: 'te',
+        choices: [],
+        data: ['a', 'b', 'c']
+    })
+    //vm.$watch("selectarr", function () {//监听保存数据数组的变化
+    //    var len = vm.array.length;
+    //    if (vm.selectarr.length == len)//子选框全部被勾选
+    //        vm.select_all_a1 = 1;
+    //    else//子选框有一个没有被勾选
+    //        vm.select_all_a1 = 0;
+    //});
+    //avalon.scan();
+</script>
+<div class="jumbotron">
+    <h1>ASP.NET</h1>
+    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
+    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+</div>
+
+<div class="row" ms-controller="test">
+    <p><input type='checkbox' data-duplex-changed="select_all_cb2(select_all_a1,array,selectarr)" ms-duplex-checked='select_all_a1'>全选</p>
+    <ul>
+        <li ms-for="el in array">
+            <input type='checkbox' data-duplex-changed="select_all_cb3(select_all_a1,array,selectarr)" ms-attr="{value:el}" ms-duplex="selectarr">{{el}}
+        </li>
+
+        @*<li ms-for="el in #array2">
+                <input type='checkbox' ms-duplex-number="selectarr2" ms-attr-value='{{el.id}}'>{{#el.name}}
+            </li>*@
+    </ul>
+    <p>选中项:{{selectarr}}</p>
+    <hr />
+    <p><input type='checkbox' data-duplex-changed="checkAll(tarr1)" ms-duplex-checked='tarr1.isselall'>全选</p>
+    <ul>
+        <li ms-for="el in tarr1.allarr">
+            <input type='checkbox' data-duplex-changed="checkOne(tarr1)" ms-attr="{value:el}" ms-duplex="tarr1.selarr">{{el}}
+        </li>
+
+        @*<li ms-for="el in #array2">
+                <input type='checkbox' ms-duplex-number="selectarr2" ms-attr-value='{{el.id}}'>{{#el.name}}
+            </li>*@
+    </ul>
+    <p>选中项:{{tarr1.selarr}}</p>
+</div>
+<hr />
+<div ms-controller="te">
+    <div>
+        <label ms-for="el in data">
+            <input type="checkbox" ms-attr="{value:el}" ms-duplex="choices"> {{el}}
+        </label>
+    </div>
+    <br>
+    <p>
+        结果：
+        {{#choices.join(",")}}
+    </p>
+</div>
